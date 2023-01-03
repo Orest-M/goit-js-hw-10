@@ -13,15 +13,15 @@ let countriesArray = [];
 
 input.addEventListener('input', debounce(fetchCountries, DEBOUNCE_DELAY));
 
-function fetchCountries(name) {
+async function fetchCountries(name) {
   countriesArray = [];
   list.innerHTML = '';
   info.innerHTML = '';
 
-  name = input.value;
+  name = input.value.trim();
 
   if (input.value.length > 0) {
-    const URL = fetch(`https://restcountries.com/v3.1/name/${name}`).then(
+    const URL = await fetch(`https://restcountries.com/v3.1/name/${name}`).then(
       resp => {
         if (!resp.ok) {
           Notiflix.Notify.failure('Oops, there is no country with that name');
