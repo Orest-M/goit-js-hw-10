@@ -39,7 +39,7 @@ async function fetchCountries(name) {
     }
 
     for (const i of URL) {
-      const y = {
+      const countriesInfoObject = {
         name: i.name.official,
         capital: i.capital,
         population: i.population,
@@ -47,12 +47,10 @@ async function fetchCountries(name) {
         languages: i.languages,
       };
 
-      countriesArray.push(y);
+      countriesArray.push(countriesInfoObject);
     }
 
     createLi();
-
-    // console.log(countriesArray);
 
     if (countriesArray.length === 1) {
       createInfo();
@@ -66,8 +64,6 @@ fetchCountries();
 
 function createLi() {
   for (const i of countriesArray) {
-    // console.log(i);
-
     const li = document.createElement('li');
     li.style.display = 'flex';
     li.style.gap = '10px';
@@ -83,12 +79,22 @@ function createInfo() {
   list.innerHTML = '';
 
   info.innerHTML = `<div style="display: flex; gap: 10px; align-items: center;">
-                    <img src="${countriesArray[0].flag}" alt="country flag" width="50px">
-                    <p style="font-weight: 700; font-size: 30px">${countriesArray[0].name}</p>
+                    <img src="${
+                      countriesArray[0].flag
+                    }" alt="country flag" width="50px">
+                    <p style="font-weight: 700; font-size: 30px">${
+                      countriesArray[0].name
+                    }</p>
                 </div>
                 <ul style="list-style: none; padding: 0px;">
-                    <li style="padding-bottom: 20px; font-size: 20px"><span style="font-weight: 600; font-size: 20px">Capital:&nbsp</span>${countriesArray[0].capital}</li>
-                    <li style="padding-bottom: 20px; font-size: 20px"><span style="font-weight: 600; font-size: 20px">Population:&nbsp</span>${countriesArray[0].population}</li>
-                    <li style="; font-size: 20px"><span style="font-weight: 600; font-size: 20px">Languages:&nbsp</span>${countriesArray[0].languages}</li>
+                    <li style="padding-bottom: 20px; font-size: 20px"><span style="font-weight: 600; font-size: 20px">Capital:&nbsp</span>${
+                      countriesArray[0].capital
+                    }</li>
+                    <li style="padding-bottom: 20px; font-size: 20px"><span style="font-weight: 600; font-size: 20px">Population:&nbsp</span>${
+                      countriesArray[0].population
+                    }</li>
+                    <li style="; font-size: 20px"><span style="font-weight: 600; font-size: 20px">Languages:&nbsp</span>${Object.values(
+                      countriesArray[0].languages
+                    ).join(', ')}</li>
                 </ul>`;
 }
