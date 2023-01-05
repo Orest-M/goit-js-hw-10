@@ -1,7 +1,6 @@
 import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
 import './css/styles.css';
-import { fetchCountries } from './js/fetchCountries.js';
 
 const input = document.querySelector('#search-box');
 const list = document.querySelector('.country-list');
@@ -12,44 +11,56 @@ list.style.listStyle = 'none';
 const DEBOUNCE_DELAY = 300;
 let countriesArray = [];
 
-input.addEventListener('input', debounce(onInput, DEBOUNCE_DELAY));
+input.addEventListener('input', debounce(fetchCountries, DEBOUNCE_DELAY));
 
-function onInput() {
+async function fetchCountries(name) {
   countriesArray = [];
   list.innerHTML = '';
   info.innerHTML = '';
 
-  const func = fetchCountries('');
+  name = input.value.trim();
 
-  func.then(resp => {
-    if (input.value.length > 0) {
-      if (resp.length > 10) {
-        Notiflix.Notify.info(
-          'Too many matches found. Please enter a more specific name.'
-        );
-        return;
+  if (input.value.length > 0) {
+    const URL = await fetch(`https://restcountries.com/v3.1/name/${name}`).then(
+      resp => {
+        if (!resp.ok) {
+          Notiflix.Notify.failure('Oops, there is no country with that name');
+        }
+
+        return resp.json();
       }
+    );
 
-      for (const i of resp) {
-        const countriesInfoObject = {
-          name: i.name.official,
-          capital: i.capital,
-          population: i.population,
-          flag: i.flags.svg,
-          languages: i.languages,
-        };
-
-        countriesArray.push(countriesInfoObject);
-      }
-
-      createLi();
-
-      if (countriesArray.length === 1) {
-        createInfo();
-      }
+    if (URL.length > 10) {
+      Notiflix.Notify.info(
+        'Too many matches found. Please enter a more specific name.'
+      );
+      return;
     }
-  });
+
+    for (const i of URL) {
+      const countriesInfoObject = {
+        name: i.name.official,
+        capital: i.capital,
+        population: i.population,
+        flag: i.flags.svg,
+        languages: i.languages,
+      };
+
+      countriesArray.push(countriesInfoObject);
+    }
+
+    createLi();
+
+    if (countriesArray.length === 1) {
+      createInfo();
+    }
+  }
 }
+
+// import { fetchCountries } from './js/fetchCountries.js';
+
+fetchCountries();
 
 function createLi() {
   for (const i of countriesArray) {
