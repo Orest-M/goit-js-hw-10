@@ -21,34 +21,37 @@ function onInput() {
 
   const func = fetchCountries('');
 
-  func.then(resp => {
-    if (input.value.length > 0) {
-      if (resp.length > 10) {
-        Notiflix.Notify.info(
-          'Too many matches found. Please enter a more specific name.'
-        );
-        return;
+  // if (input.value.length > 0) для того, щоб при пустому інпуті не йшов запит і не видавало помилку
+  if (input.value.length > 0) {
+    func.then(resp => {
+      if (input.value.length > 0) {
+        if (resp.length > 10) {
+          Notiflix.Notify.info(
+            'Too many matches found. Please enter a more specific name.'
+          );
+          return;
+        }
+
+        for (const i of resp) {
+          const countriesInfoObject = {
+            name: i.name.official,
+            capital: i.capital,
+            population: i.population,
+            flag: i.flags.svg,
+            languages: i.languages,
+          };
+
+          countriesArray.push(countriesInfoObject);
+        }
+
+        createLi();
+
+        if (countriesArray.length === 1) {
+          createInfo();
+        }
       }
-
-      for (const i of resp) {
-        const countriesInfoObject = {
-          name: i.name.official,
-          capital: i.capital,
-          population: i.population,
-          flag: i.flags.svg,
-          languages: i.languages,
-        };
-
-        countriesArray.push(countriesInfoObject);
-      }
-
-      createLi();
-
-      if (countriesArray.length === 1) {
-        createInfo();
-      }
-    }
-  });
+    });
+  }
 }
 
 function createLi() {
