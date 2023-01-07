@@ -15,61 +15,71 @@ let countriesArray = [];
 input.addEventListener('input', debounce(onInput, DEBOUNCE_DELAY));
 
 function onInput() {
+  cleanVar();
+
+  const value = input.value.trim();
+
+  if (value.length === 0) {
+    return;
+  }
+
+  const func = fetchCountries(value);
+
+  func
+    .then(resp => {
+      for (const i of resp) {
+        const countriesInfoObject = {
+          name: i.name.official,
+          capital: i.capital,
+          population: i.population,
+          flag: i.flags.svg,
+          languages: i.languages,
+        };
+
+        countriesArray.push(countriesInfoObject);
+      }
+
+      if (countriesArray.length === 1) {
+        createInfo();
+      }
+
+      if (resp.length >= 2 && resp.length <= 10) {
+        createLi();
+      }
+
+      if (resp.length > 10) {
+        Notiflix.Notify.info(
+          'Too many matches found. Please enter a more specific name.'
+        );
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      Notiflix.Notify.failure('Oops, there is no country with that name');
+    });
+}
+
+function cleanVar() {
   countriesArray = [];
   list.innerHTML = '';
   info.innerHTML = '';
-
-  const func = fetchCountries('');
-
-  // if (input.value.length > 0) для того, щоб при пустому інпуті не йшов запит і не видавало помилку
-  if (input.value.length > 0) {
-    func.then(resp => {
-      if (input.value.length > 0) {
-        if (resp.length > 10) {
-          Notiflix.Notify.info(
-            'Too many matches found. Please enter a more specific name.'
-          );
-          return;
-        }
-
-        for (const i of resp) {
-          const countriesInfoObject = {
-            name: i.name.official,
-            capital: i.capital,
-            population: i.population,
-            flag: i.flags.svg,
-            languages: i.languages,
-          };
-
-          countriesArray.push(countriesInfoObject);
-        }
-
-        createLi();
-
-        if (countriesArray.length === 1) {
-          createInfo();
-        }
-      }
-    });
-  }
 }
 
 function createLi() {
-  for (const i of countriesArray) {
-    const li = document.createElement('li');
-    li.style.display = 'flex';
-    li.style.gap = '10px';
-    li.style.alignItems = 'center';
-    li.innerHTML = `<img src="${i.flag}" alt="country flag" width="30px">
-            <p>${i.name}</p>`;
+  const obj = countriesArray
+    .map(
+      ({ flag, name }) =>
+        `<li style="display: flex; gap: 10px; align-items: center;">
+          <img src="${flag}" alt="country flag" width="30px">
+          <p>${name}</p>
+        <li>`
+    )
+    .join('');
 
-    list.append(li);
-  }
+  list.insertAdjacentHTML('afterbegin', obj);
 }
 
 function createInfo() {
-  list.innerHTML = '';
-
   info.innerHTML = `<div style="display: flex; gap: 10px; align-items: center;">
                     <img src="${
                       countriesArray[0].flag
